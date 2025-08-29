@@ -2,8 +2,10 @@
 #define GRAPHICS_H
 
 #include <stdio.h>
+#include "../board/board.h"
 
 void clear_screen();
 
-#endif
+void print_board(Board *b);
 
+#endif

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "game.h"
 #include "board/board.h"
+#include "graphics/graphic_printer.h"
+
+static void begin_game_loop(Board *board);
 
 // Function that starts the game
 void start_game(const char* difficulty, int rows, int cols, int mines) {
@@ -17,8 +20,14 @@ void start_game(const char* difficulty, int rows, int cols, int mines) {
     free_board(board);
 }
 
-void begin_game_loop(Board *board) {
+static void begin_game_loop(Board *board) {
     // Placeholder for the actual game loop logic
     // This function would handle user input, reveal tiles, check win/loss conditions, etc.
     printf("Game loop not implemented yet.\n");
+
+    int running = 1;
+    do {
+        // Game loop logic goes here
+        print_board(board); // Example function to print the board state
+    } while (running == 1);
 }

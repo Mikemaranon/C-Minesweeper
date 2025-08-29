@@ -33,7 +33,7 @@ void fillBoard(Board *b, int mines) {
 
     srand(time(NULL));
 
-    // Primero inicializamos todo como EMPTY
+    // initialyze all tiles as empty
     for (int r = 0; r < b->ySize; r++) {
         for (int c = 0; c < b->xSize; c++) {
             b->tiles[r][c].type = ENTITY_EMPTY;
@@ -42,12 +42,12 @@ void fillBoard(Board *b, int mines) {
         }
     }
 
-    // Ponemos bombas de forma aleatoria usando Fisher-Yates sobre índices
+    // Random unique positions for bombs
     int totalCells = b->xSize * b->ySize;
     int *positions = malloc(sizeof(int) * totalCells);
     for (int i = 0; i < totalCells; i++) positions[i] = i;
 
-    // Mezclamos posiciones
+    // Mix positions
     for (int i = totalCells - 1; i > 0; i--) {
         int j = rand() % (i + 1);
         int tmp = positions[i];
@@ -55,7 +55,7 @@ void fillBoard(Board *b, int mines) {
         positions[j] = tmp;
     }
 
-    // Colocamos las bombas
+    // set bombs
     for (int i = 0; i < mines; i++) {
         int pos = positions[i];
         int r = pos / b->xSize;
