@@ -14,7 +14,7 @@ typedef struct {
 extern const Difficulty DIFFICULTIES[];
 extern const int NUM_DIFFICULTIES;
 
-// Funciones del menú
+// Menu functions
 int print_menu(void);
 void show_instructions(void);
 void run_game(void);
