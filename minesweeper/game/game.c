@@ -4,11 +4,21 @@
 
 // Function that starts the game
 void start_game(const char* difficulty, int rows, int cols, int mines) {
-    printf("Starting Minesweeper with difficulty level %d...\n", difficulty);
+    printf("Starting Minesweeper with difficulty level %s...\n", difficulty);
 
-    Board *board = createBoard(rows, cols, mines);  // intialyze board
+    Board *board = create_board(rows, cols, mines);  // intialyze board
     if (!board) return;
 
     printf("Board is ready. Let's play!\n");
+
+    begin_game_loop(board); // Start the game loop (not implemented here)
+
+    // Free the board after use
+    free_board(board);
 }
 
+void begin_game_loop(Board *board) {
+    // Placeholder for the actual game loop logic
+    // This function would handle user input, reveal tiles, check win/loss conditions, etc.
+    printf("Game loop not implemented yet.\n");
+}

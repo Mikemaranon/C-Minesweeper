@@ -1,5 +1,6 @@
 #include "main.h"
 #include "game/game.h"
+#include "game/graphics/graphic_printer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +14,7 @@ const Difficulty DIFFICULTIES[] = {
 const int NUM_DIFFICULTIES = sizeof(DIFFICULTIES) / sizeof(DIFFICULTIES[0]);
 
 int main(void) {
+    clear_screen();
     printf("Welcome to the Game!\n");
     
     int choice;
@@ -53,8 +55,7 @@ int main(void) {
 
 int print_menu() {
     int c;
-    printf("\033[2J\033[H"); // Clear screen and move cursor to home
-    fflush(stdout);           // Force the output to terminal
+    clear_screen();
 
     printf("\n\033[1;33m"); // Yellow, bold text
     printf("╔════════════════════════════╗\n");
@@ -78,10 +79,9 @@ int print_menu() {
 }
 
 void show_instructions() {
-    printf("\033[2J\033[H"); // Clear screen and move cursor to home
-    fflush(stdout);           // Force the output to terminal
+    clear_screen();
 
-    FILE *file = fopen("instructions.txt", "r");
+    FILE *file = fopen("minesweeper/assets/instructions.txt", "r");
     if (file == NULL) {
         printf("Error: Could not open instructions.txt\n");
         return;
@@ -113,7 +113,7 @@ void show_instructions() {
 
 
 void run_game() {
-    printf("\033[2J\033[H"); // Clear screen and move cursor to home
+    clear_screen();
     
     printf("╔════════════════════════════════════════╗\n");
     printf("║         Select Difficulty Level        ║\n");

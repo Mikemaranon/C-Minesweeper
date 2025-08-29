@@ -2,7 +2,7 @@
 #include <time.h>
 #include "board.h"
 
-Board *createBoard(int x, int y, int mines) {
+Board *create_board(int x, int y, int mines) {
     Board *b = malloc(sizeof(Board));
     if (!b) return NULL;
 
@@ -90,7 +90,7 @@ void fillValues(Board *b) {
     }
 }
 
-void freeBoard(Board *b) {
+void free_board(Board *b) {
     if (!b) return;
     for (int i = 0; i < b->ySize; i++) {
         free(b->tiles[i]);
