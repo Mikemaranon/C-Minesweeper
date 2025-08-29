@@ -14,7 +14,8 @@
 #define TXT_WHITE "\x1b[97m"
 
 // Cell dimensions and spacing
-#define CELL_SIZE 6
+#define CELL_SIZE_X 7
+#define CELL_SIZE_Y 3
 #define CELL_SPACING 2
 
 // Selects background color depending on entity state
@@ -36,17 +37,17 @@ void clear_screen() {
 // Prints the game board with graphical cells
 void print_board(Board *b) {
     for (int r = 0; r < b->ySize; r++) {
-        // Each cell occupies CELL_SIZE rows
-        for (int subrow = 0; subrow < CELL_SIZE; subrow++) {
+        // Each cell occupies CELL_SIZE_Y rows
+        for (int subrow = 0; subrow < CELL_SIZE_Y; subrow++) {
             for (int c = 0; c < b->xSize; c++) {
                 Entity *e = &b->tiles[r][c];
                 const char *color = get_cell_color(e);
 
-                // Draw each cell with CELL_SIZE columns
-                for (int subcol = 0; subcol < CELL_SIZE; subcol++) {
-                    // Print number centered if revealed and not a bomb
+                // Draw each cell with CELL_SIZE_X columns
+                for (int subcol = 0; subcol < CELL_SIZE_X; subcol++) {
+                    // Print the number centered if revealed and not a bomb
                     if (e->revealed && e->type == ENTITY_EMPTY
-                        && subrow == CELL_SIZE/2 && subcol == CELL_SIZE/2) {
+                        && subrow == CELL_SIZE_Y / 2 && subcol == CELL_SIZE_X / 2) {
                         printf("%s%s%d%s%s",
                             color,
                             TXT_BLACK,
@@ -55,9 +56,9 @@ void print_board(Board *b) {
                             color
                         );
                     }
-                    // Print a bomb symbol if revealed and it is a bomb
+                    // Print a bomb symbol centered if revealed and is a bomb
                     else if (e->revealed && e->type == ENTITY_BOMB
-                        && subrow == CELL_SIZE/2 && subcol == CELL_SIZE/2) {
+                        && subrow == CELL_SIZE_Y / 2 && subcol == CELL_SIZE_X / 2) {
                         printf("%s%s*%s%s",
                             color,
                             TXT_WHITE,
@@ -66,7 +67,7 @@ void print_board(Board *b) {
                         );
                     }
                     else {
-                        // Fill rest of the cell
+                        // Fill the rest of the cell
                         printf("%s ", color);
                     }
                 }
@@ -79,9 +80,6 @@ void print_board(Board *b) {
             }
             printf("\n");
         }
-        // Vertical spacing between rows
-        for (int sp = 0; sp < CELL_SPACING; sp++) {
-            printf("\n");
-        }
+        printf("\n");
     }
 }
