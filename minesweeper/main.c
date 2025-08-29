@@ -136,9 +136,7 @@ void run_game() {
     Difficulty selected = DIFFICULTIES[choice - 1];
     printf("Starting %s game with %dx%d grid and %d mines...\n", selected.name, selected.rows, selected.cols, selected.mines);
     
-    // Placeholder for actual game logic
-    // Here you would initialize the game board and start the game loop
-    printf("Game logic not implemented yet. Returning to menu...\n");
+    start_game(selected.name, selected.rows, selected.cols, selected.mines); // Call the game start function from game.c
     
     printf("Press Enter to return to the menu...");
     while (getchar() != '\n'); // Clear any leftover input
