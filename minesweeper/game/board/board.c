@@ -16,12 +16,13 @@ static void removeFocus(Board *b, int x, int y);
 int firstMoveDone = 0;
 int revealedTiles = 0;
 int flaggedTiles = 0;
+int maxFlags = 0;
 int totalTiles = 0;
 
 int check_win_condition(Board *b) {
     if (!b) return 0;
 
-    if (revealedTiles + flaggedTiles == totalTiles) {
+    if (revealedTiles + flaggedTiles == totalTiles && flaggedTiles <= maxFlags) {
         return 1; // Win condition met
     }
     return 0;
@@ -36,6 +37,7 @@ Board *create_board(int x, int y, int mines) {
     totalTiles = x * y; // total tiles count
     revealedTiles = 0; // reset revealed tiles count
     flaggedTiles = 0; // reset flagged tiles count
+    maxFlags = mines; // set max flags to number of mines
 
     b->xSize = x;
     b->ySize = y;
@@ -135,8 +137,8 @@ int reveal_tile(Board *b) {
                 int ny = y + dy[i];
                 if (nx >= 0 && nx < b->xSize && ny >= 0 && ny < b->ySize) {
                     Entity *adj = &b->tiles[ny][nx];
+                    adj->adjacentBombs -= 1;
                     if (adj->type != ENTITY_BOMB) {
-                        adj->adjacentBombs -= 1;
                         showTile(adj);
                     }
                 }
@@ -204,7 +206,7 @@ static int checkAdjacentTiles(Board *b, int x, int y) {
 
     // --- CASE 0 ---
     if (e->adjacentBombs == 0) {
-        // first reveal all adjacent non-revealed, non-bomb tiles
+        // Reveal all adjacent non-revealed, non-bomb tiles and recurse on zeros
         for (int i = 0; i < 8; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
@@ -216,25 +218,15 @@ static int checkAdjacentTiles(Board *b, int x, int y) {
 
             if (!adj->revealed && adj->type != ENTITY_BOMB) {
                 showTile(adj);
-            }
-        }
-
-        // Now recurse on neighbors that are 0
-        for (int i = 0; i < 8; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-
-            if (nx < 0 || ny < 0 || nx >= b->xSize || ny >= b->ySize)
-                continue;
-
-            Entity *adj = &b->tiles[ny][nx];
-
-            if (adj->adjacentBombs == 0 && !adj->revealed) {
-                checkAdjacentTiles(b, nx, ny);
+                
+                // If the revealed neighbor is also 0, recurse immediately
+                if (adj->adjacentBombs == 0) {
+                    checkAdjacentTiles(b, nx, ny);
+                }
             }
         }
         return 1;
-    } 
+    }   
     // --- CASE != 0 ---
     else {
         // if revealed, check "chording"
@@ -278,7 +270,6 @@ static int checkAdjacentTiles(Board *b, int x, int y) {
         return 1;
     }
 }
-
 
 static void removeFocus(Board *b, int x, int y) {
     if (!b) return;
