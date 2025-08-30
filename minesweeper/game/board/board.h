@@ -17,6 +17,7 @@ typedef struct {
     Cursor cursor;    // cursor position
 } Board;
 
+int check_win_condition(Board *b);
 Board *create_board(int x, int y, int mines);
 void set_initial_cursor(Board *b);
 void move_cursor(Board *b, int dx, int dy);

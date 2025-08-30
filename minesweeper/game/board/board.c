@@ -3,6 +3,10 @@
 #include "board.h"
 
 // Function prototypes for internal use
+
+
+static void showTile(Entity *e); 
+static void setFlagged(Entity *e);
 static int checkAdjacentTiles(Board *b, int x, int y);
 static void fillBoard(Board *b, int mines);
 static void fillValues(Board *b);
@@ -10,11 +14,28 @@ static void focusTile(Board *b, int x, int y);
 static void removeFocus(Board *b, int x, int y);
 
 int firstMoveDone = 0;
+int revealedTiles = 0;
+int flaggedTiles = 0;
+int totalTiles = 0;
+
+int check_win_condition(Board *b) {
+    if (!b) return 0;
+
+    if (revealedTiles + flaggedTiles == totalTiles) {
+        return 1; // Win condition met
+    }
+    return 0;
+}
 
 // Creates and initializes a new board
 Board *create_board(int x, int y, int mines) {
     Board *b = malloc(sizeof(Board));
     if (!b) return NULL;
+
+    firstMoveDone = 0; // reset first move flag
+    totalTiles = x * y; // total tiles count
+    revealedTiles = 0; // reset revealed tiles count
+    flaggedTiles = 0; // reset flagged tiles count
 
     b->xSize = x;
     b->ySize = y;
@@ -83,7 +104,7 @@ void flag_tile(Board *b) {
     Entity *e = &b->tiles[y][x];
 
     if (!e->revealed) {
-        e->flagged = !e->flagged; // Toggle flag
+        setFlagged(e);
     }
 }
 
@@ -104,8 +125,8 @@ int reveal_tile(Board *b) {
         int dx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
         int dy[] = {-1, -1, -1, 0, 0, 1, 1, 1};
 
-        e->revealed = 1;  // Reveal the tile
-        // If first move is a bomb, relocate it
+        showTile(e); // reveal current tile
+        // If first move is a bomb, destroy it and reveal neighbors
         if (e->type == ENTITY_BOMB) {
             // change type of current tile
             e->type = ENTITY_EMPTY;
@@ -116,7 +137,7 @@ int reveal_tile(Board *b) {
                     Entity *adj = &b->tiles[ny][nx];
                     if (adj->type != ENTITY_BOMB) {
                         adj->adjacentBombs -= 1;
-                        adj->revealed = 1;
+                        showTile(adj);
                     }
                 }
             }
@@ -129,17 +150,17 @@ int reveal_tile(Board *b) {
                 if (nx >= 0 && nx < b->xSize && ny >= 0 && ny < b->ySize) {
                     Entity *adj = &b->tiles[ny][nx];
                     if (adj->type != ENTITY_BOMB) {                        
-                        adj->revealed = 1;
+                        showTile(adj);
                     }
                 }
             }
         }
 
-        return checkAdjacentTiles(b, x, y);
+        return 1;
     }
 
     if (!e->revealed && !e->flagged) {
-        e->revealed = 1; // Reveal the tile
+        showTile(e); // Reveal the tile
         if (e->type == ENTITY_BOMB) {
             return 0; // Hit a bomb
         }
@@ -156,6 +177,22 @@ void free_board(Board *b) {
     }
     free(b->tiles);
     free(b);
+}
+
+static void showTile(Entity *e) {
+    revealedTiles++;
+    e->revealed = 1;
+}
+
+static void setFlagged(Entity *e) {
+
+    if (e->flagged == 0) {
+        flaggedTiles++;
+        e->flagged = 1;
+    } else {
+        flaggedTiles--;
+        e->flagged = 0;
+    }
 }
 
 static int checkAdjacentTiles(Board *b, int x, int y) {
@@ -178,7 +215,7 @@ static int checkAdjacentTiles(Board *b, int x, int y) {
             Entity *adj = &b->tiles[ny][nx];
 
             if (!adj->revealed && adj->type != ENTITY_BOMB) {
-                adj->revealed = 1;
+                showTile(adj);
             }
         }
 
@@ -225,7 +262,7 @@ static int checkAdjacentTiles(Board *b, int x, int y) {
 
                     Entity *adj = &b->tiles[ny][nx];
                     if (!adj->revealed && !adj->flagged) {
-                        adj->revealed = 1;
+                        showTile(adj);
                         if (adj->type == ENTITY_BOMB) {
                             return 0; // Hit a bomb
                         }
@@ -264,7 +301,7 @@ static void fillBoard(Board *b, int mines) {
     for (int r = 0; r < b->ySize; r++) {
         for (int c = 0; c < b->xSize; c++) {
             b->tiles[r][c].type = ENTITY_EMPTY;
-            b->tiles[r][c].revealed = 0;
+            b->tiles[r][c].revealed = REVEALED;
             b->tiles[r][c].adjacentBombs = 0;
         }
     }
@@ -300,11 +337,6 @@ static void fillValues(Board *b) {
 
     for (int r = 0; r < b->ySize; r++) {
         for (int c = 0; c < b->xSize; c++) {
-            if (b->tiles[r][c].type == ENTITY_BOMB) {
-                b->tiles[r][c].adjacentBombs = -1; // opcional
-                continue;
-            }
-
             int count = 0;
             for (int i = 0; i < 8; i++) {
                 int nr = r + dr[i];

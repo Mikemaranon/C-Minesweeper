@@ -65,5 +65,13 @@ static void beginGameLoop(Board *board) {
                     break;
             }
         }
+
+        if (check_win_condition(board) == 1) {
+            print_board(board);
+            printf("Congratulations! You've cleared the board!\n");
+            running = 0;
+            set_raw_mode(0);
+        }
+
     } while (running == 1);
 }
