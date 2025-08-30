@@ -9,6 +9,8 @@ static void fillValues(Board *b);
 static void focusTile(Board *b, int x, int y);
 static void removeFocus(Board *b, int x, int y);
 
+int firstMoveDone = 0;
+
 // Creates and initializes a new board
 Board *create_board(int x, int y, int mines) {
     Board *b = malloc(sizeof(Board));
@@ -93,6 +95,48 @@ int reveal_tile(Board *b) {
     int x = b->cursor.positionX;
     int y = b->cursor.positionY;
     Entity *e = &b->tiles[y][x];
+
+    // --- FIRST TURN ---
+    if (firstMoveDone == 0) {
+        firstMoveDone = 1;
+        
+        // reduce adjacentBombs count of neighbors
+        int dx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+        int dy[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+
+        e->revealed = 1;  // Reveal the tile
+        // If first move is a bomb, relocate it
+        if (e->type == ENTITY_BOMB) {
+            // change type of current tile
+            e->type = ENTITY_EMPTY;
+            for (int i = 0; i < 8; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+                if (nx >= 0 && nx < b->xSize && ny >= 0 && ny < b->ySize) {
+                    Entity *adj = &b->tiles[ny][nx];
+                    if (adj->type != ENTITY_BOMB) {
+                        adj->adjacentBombs -= 1;
+                        adj->revealed = 1;
+                    }
+                }
+            }
+        } 
+        // If first move is not a bomb, just reveal neighbors
+        else {
+            for (int i = 0; i < 8; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+                if (nx >= 0 && nx < b->xSize && ny >= 0 && ny < b->ySize) {
+                    Entity *adj = &b->tiles[ny][nx];
+                    if (adj->type != ENTITY_BOMB) {                        
+                        adj->revealed = 1;
+                    }
+                }
+            }
+        }
+
+        return checkAdjacentTiles(b, x, y);
+    }
 
     if (!e->revealed && !e->flagged) {
         e->revealed = 1; // Reveal the tile
