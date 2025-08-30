@@ -3,7 +3,7 @@
 #include "board.h"
 
 // Function prototypes for internal use
-static void checkAdjacentTiles(Board *b, int x, int y);
+static int checkAdjacentTiles(Board *b, int x, int y);
 static void fillBoard(Board *b, int mines);
 static void fillValues(Board *b);
 static void focusTile(Board *b, int x, int y);
@@ -101,9 +101,7 @@ int reveal_tile(Board *b) {
         }
     }
 
-    checkAdjacentTiles(b, x, y);
-
-    return 1; // Safe
+    return checkAdjacentTiles(b, x, y);
 }
 
 // Frees the memory allocated for the board
@@ -116,8 +114,8 @@ void free_board(Board *b) {
     free(b);
 }
 
-static void checkAdjacentTiles(Board *b, int x, int y) {
-    if (!b) return;
+static int checkAdjacentTiles(Board *b, int x, int y) {
+    if (!b) return -1;
 
     Entity *e = &b->tiles[y][x];
     int dx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
@@ -154,6 +152,7 @@ static void checkAdjacentTiles(Board *b, int x, int y) {
                 checkAdjacentTiles(b, nx, ny);
             }
         }
+        return 1;
     } 
     // --- CASE != 0 ---
     else {
@@ -181,8 +180,11 @@ static void checkAdjacentTiles(Board *b, int x, int y) {
                         continue;
 
                     Entity *adj = &b->tiles[ny][nx];
-                    if (!adj->revealed && !adj->flagged && adj->type != ENTITY_BOMB) {
+                    if (!adj->revealed && !adj->flagged) {
                         adj->revealed = 1;
+                        if (adj->type == ENTITY_BOMB) {
+                            return 0; // Hit a bomb
+                        }
 
                         // if a revealed neighbor is 0, recurse
                         if (adj->adjacentBombs == 0) {
@@ -192,6 +194,7 @@ static void checkAdjacentTiles(Board *b, int x, int y) {
                 }
             }
         }
+        return 1;
     }
 }
 

@@ -55,6 +55,7 @@ static void beginGameLoop(Board *board) {
                     if (running == 0) {
                         print_board(board);
                         printf("Game Over! You hit a bomb!\n");
+                        set_raw_mode(0);
                     }
                     break;
                 case 'q': // exit
