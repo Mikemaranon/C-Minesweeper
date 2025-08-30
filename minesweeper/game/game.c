@@ -29,5 +29,6 @@ static void begin_game_loop(Board *board) {
     do {
         // Game loop logic goes here
         print_board(board); // Example function to print the board state
+        running = 0; // Placeholder to exit the loop immediately
     } while (running == 1);
 }
