@@ -58,10 +58,11 @@ static void printCellContent(Entity *e, int subcol, int subrow, const char *colo
 
     if (e->focused && isBorder) {
         // White border for focused cell
-        printf("%s %s%s", 
+        printf("%s%s %s%s", 
             color, 
             BG_WHITE, 
-            RESET
+            RESET, 
+            color
         );
         return;
     }

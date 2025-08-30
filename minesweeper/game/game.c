@@ -33,7 +33,7 @@ static void beginGameLoop(Board *board) {
             switch (ch) {
                 case 'w':
                 case 'W':
-                    move_cursor(board, 0, 1);
+                    move_cursor(board, 0, -1);
                     break;
                 case 'a':
                 case 'A':
@@ -41,7 +41,7 @@ static void beginGameLoop(Board *board) {
                     break;
                 case 's':
                 case 'S':
-                    move_cursor(board, 0, -1);
+                    move_cursor(board, 0, 1);
                     break;
                 case 'd':
                 case 'D':

@@ -3,6 +3,8 @@
 
 #include "../entities/entity.h"
 
+#define REVEALED 0
+
 typedef struct {
     int positionX;  // current cursor position X
     int positionY;  // current cursor position Y

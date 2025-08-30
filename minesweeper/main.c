@@ -6,9 +6,9 @@
 #include <string.h>
 
 const Difficulty DIFFICULTIES[] = {
-    {5, 5, 10, "Beginner"},
-    {12, 12, 20, "Intermediate"},
-    {18, 18, 50, "Expert"}
+    {5, 5, 5, "Beginner"},
+    {12, 12, 30, "Intermediate"},
+    {18, 18, 65, "Expert"}
 };
 
 const int NUM_DIFFICULTIES = sizeof(DIFFICULTIES) / sizeof(DIFFICULTIES[0]);

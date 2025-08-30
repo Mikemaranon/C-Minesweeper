@@ -111,7 +111,6 @@ static void removeFocus(Board *b, int x, int y) {
 }
 
 static void focusTile(Board *b, int x, int y) {
-    if (!b) return;
     if (x >= 0 && x < b->xSize && y >= 0 && y < b->ySize) {
         b->tiles[y][x].focused = 1; // Set focus to the specified tile
     }
