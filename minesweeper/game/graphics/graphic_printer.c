@@ -7,7 +7,7 @@ static void printCellContent(Entity *e, int subcol, int subrow, const char *colo
 // Selects background color depending on entity state
 static const char* get_cell_color(Entity *e) {
     if (!e->revealed) {
-        if (e->type == ENTITY_FLAG) return BLUE;
+        if (e->flagged == 1) return BLUE;
         return GREEN;
     } else {
         if (e->type == ENTITY_BOMB) return RED;
@@ -57,8 +57,12 @@ static void printCellContent(Entity *e, int subcol, int subrow, const char *colo
                     subcol == 0 || subcol == CELL_SIZE_X - 1);
 
     if (e->focused && isBorder) {
-        // Marco blanco cuando está enfocado
-        printf("%s %s%s", color, BG_WHITE, RESET);
+        // White border for focused cell
+        printf("%s %s%s", 
+            color, 
+            BG_WHITE, 
+            RESET
+        );
         return;
     }
 

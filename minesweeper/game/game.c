@@ -3,7 +3,7 @@
 #include "graphics/graphic_printer.h"
 #include "sysconf/sysconf.h"
 
-static void begin_game_loop(Board *board);
+static void beginGameLoop(Board *board);
 
 // Function that starts the game
 void start_game(const char* difficulty, int rows, int cols, int mines) {
@@ -13,12 +13,12 @@ void start_game(const char* difficulty, int rows, int cols, int mines) {
     if (!board) return;
 
     printf("Board is ready. Let's play!\n");
-    begin_game_loop(board); // Start the game loop (not implemented here)
+    beginGameLoop(board); // Start the game loop (not implemented here)
 
     free_board(board); // Free the board after use
 }
 
-static void begin_game_loop(Board *board) {
+static void beginGameLoop(Board *board) {
 
     int running = 1;
     char ch;
@@ -31,28 +31,32 @@ static void begin_game_loop(Board *board) {
 
         if (read(STDIN_FILENO, &ch, 1) > 0) {
             switch (ch) {
-                case 'o':
-                case 'O':
-                    break;
                 case 'w':
                 case 'W':
+                    move_cursor(board, 0, 1);
                     break;
                 case 'a':
                 case 'A':
+                    move_cursor(board, -1, 0);
                     break;
                 case 's':
                 case 'S':
+                    move_cursor(board, 0, -1);
                     break;
                 case 'd':
                 case 'D':
+                    move_cursor(board, 1, 0);
                     break;
                 case 10: // Enter
+                    flag_tile(board);
                     break;
                 case 127: // backspace
+                    reveal_tile(board);
                     break;
                 case 'q': // exit
                 case 'Q':
                     running = 0;
+                    set_raw_mode(0);
                     break;
             }
         }

@@ -49,7 +49,7 @@ void move_cursor(Board *b, int dx, int dy) {
     if (!b) return;
 
     removeFocus(b, b->cursor.positionX, b->cursor.positionY);
-    
+
     b->cursor.positionX += dx;
     b->cursor.positionY += dy;
 
@@ -71,6 +71,28 @@ void move_cursor(Board *b, int dx, int dy) {
     }
 
     focusTile(b, b->cursor.positionX, b->cursor.positionY);
+}
+
+void flag_tile(Board *b) {
+    if (!b) return;
+    int x = b->cursor.positionX;
+    int y = b->cursor.positionY;
+    Entity *e = &b->tiles[y][x];
+
+    if (!e->revealed) {
+        e->flagged = !e->flagged; // Toggle flag
+    }
+}
+
+void reveal_tile(Board *b) {
+    if (!b) return;
+    int x = b->cursor.positionX;
+    int y = b->cursor.positionY;
+    Entity *e = &b->tiles[y][x];
+
+    if (!e->revealed && !e->flagged) {
+        e->revealed = 1; // Reveal the tile
+    }
 }
 
 // Frees the memory allocated for the board
