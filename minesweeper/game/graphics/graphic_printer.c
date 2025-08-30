@@ -2,7 +2,7 @@
 
 // function declarations
 static const char* get_cell_color(Entity *e);
-static void print_cell_content(Entity *e, int subcol, int subrow, const char *color);
+static void printCellContent(Entity *e, int subcol, int subrow, const char *color);
 
 // Selects background color depending on entity state
 static const char* get_cell_color(Entity *e) {
@@ -36,7 +36,7 @@ void print_board(Board *b) {
                 // Draw each cell with CELL_SIZE_X columns
                 for (int subcol = 0; subcol < CELL_SIZE_X; subcol++) {
                     // Print the number centered if revealed and not a bomb
-                    print_cell_content(e, subcol, subrow, color);
+                    printCellContent(e, subcol, subrow, color);
                 }
                 printf("%s", RESET);
 
@@ -51,7 +51,17 @@ void print_board(Board *b) {
     }
 }
 
-static void print_cell_content(Entity *e, int subcol, int subrow, const char *color) {
+static void printCellContent(Entity *e, int subcol, int subrow, const char *color) {
+
+    int isBorder = (subrow == 0 || subrow == CELL_SIZE_Y - 1 ||
+                    subcol == 0 || subcol == CELL_SIZE_X - 1);
+
+    if (e->focused && isBorder) {
+        // Marco blanco cuando está enfocado
+        printf("%s %s%s", color, BG_WHITE, RESET);
+        return;
+    }
+
     if (e->revealed && e->type == ENTITY_EMPTY
         && subrow == CELL_SIZE_Y / 2 && subcol == CELL_SIZE_X / 2) {
         printf("%s%s%d%s%s",

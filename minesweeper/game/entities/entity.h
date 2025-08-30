@@ -9,6 +9,7 @@ typedef enum {
 
 typedef struct {
     EntityType type;
+    int focused;        // 0 = not focused, 1 = focused
     int revealed;       // 0 = hidden, 1 = revealed
     int adjacentBombs;  // Number of adjacent bombs
 } Entity;

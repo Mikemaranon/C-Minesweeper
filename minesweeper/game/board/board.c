@@ -2,6 +2,13 @@
 #include <time.h>
 #include "board.h"
 
+// Function prototypes for internal use
+static void fillBoard(Board *b, int mines);
+static void fillValues(Board *b);
+static void focusTile(Board *b, int x, int y);
+static void removeFocus(Board *b, int x, int y);
+
+// Creates and initializes a new board
 Board *create_board(int x, int y, int mines) {
     Board *b = malloc(sizeof(Board));
     if (!b) return NULL;
@@ -28,7 +35,68 @@ Board *create_board(int x, int y, int mines) {
     return b;
 }
 
-void fillBoard(Board *b, int mines) {
+// Sets the initial cursor position to the center of the board
+void set_initial_cursor(Board *b) {
+    if (!b) return;
+    b->cursor.positionX = b->xSize / 2;
+    b->cursor.positionY = b->ySize / 2;
+
+    focusTile(b, b->cursor.positionX, b->cursor.positionY);
+}
+
+// Moves the cursor by (dx, dy), ensuring it stays within board bounds
+void move_cursor(Board *b, int dx, int dy) {
+    if (!b) return;
+
+    removeFocus(b, b->cursor.positionX, b->cursor.positionY);
+    
+    b->cursor.positionX += dx;
+    b->cursor.positionY += dy;
+
+    // Ensure cursor stays within bounds
+    if (b->cursor.positionX < 0) {
+        b->cursor.positionX = 0;
+    }
+        
+    if (b->cursor.positionX >= b->xSize) {
+        b->cursor.positionX = b->xSize - 1;
+    }
+
+    if (b->cursor.positionY < 0) {
+        b->cursor.positionY = 0;
+    }
+
+    if (b->cursor.positionY >= b->ySize) {
+        b->cursor.positionY = b->ySize - 1;
+    }
+
+    focusTile(b, b->cursor.positionX, b->cursor.positionY);
+}
+
+// Frees the memory allocated for the board
+void free_board(Board *b) {
+    if (!b) return;
+    for (int i = 0; i < b->ySize; i++) {
+        free(b->tiles[i]);
+    }
+    free(b->tiles);
+    free(b);
+}
+
+static void removeFocus(Board *b, int x, int y) {
+    if (!b) return;
+    b->tiles[y][x].focused = 0; // Remove focus from tile
+}
+
+static void focusTile(Board *b, int x, int y) {
+    if (!b) return;
+    if (x >= 0 && x < b->xSize && y >= 0 && y < b->ySize) {
+        b->tiles[y][x].focused = 1; // Set focus to the specified tile
+    }
+}
+
+// Fills the board with bombs and empty tiles
+static void fillBoard(Board *b, int mines) {
     if (!b) return;
 
     srand(time(NULL));
@@ -66,7 +134,8 @@ void fillBoard(Board *b, int mines) {
     free(positions);
 }
 
-void fillValues(Board *b) {
+// Fills the board with the count of adjacent bombs for each tile
+static void fillValues(Board *b) {
     int dr[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
     int dc[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
 
@@ -88,13 +157,4 @@ void fillValues(Board *b) {
             b->tiles[r][c].adjacentBombs = count;
         }
     }
-}
-
-void free_board(Board *b) {
-    if (!b) return;
-    for (int i = 0; i < b->ySize; i++) {
-        free(b->tiles[i]);
-    }
-    free(b->tiles);
-    free(b);
 }
