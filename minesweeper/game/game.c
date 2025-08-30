@@ -51,7 +51,11 @@ static void beginGameLoop(Board *board) {
                     flag_tile(board);
                     break;
                 case 127: // backspace
-                    reveal_tile(board);
+                    running = reveal_tile(board);
+                    if (running == 0) {
+                        print_board(board);
+                        printf("Game Over! You hit a bomb!\n");
+                    }
                     break;
                 case 'q': // exit
                 case 'Q':

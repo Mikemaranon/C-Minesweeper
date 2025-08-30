@@ -21,7 +21,7 @@ Board *create_board(int x, int y, int mines);
 void set_initial_cursor(Board *b);
 void move_cursor(Board *b, int dx, int dy);
 void flag_tile(Board *b);
-void reveal_tile(Board *b);
+int reveal_tile(Board *b);
 void free_board(Board *b);
 
 #endif

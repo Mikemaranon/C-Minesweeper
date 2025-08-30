@@ -3,6 +3,7 @@
 #include "board.h"
 
 // Function prototypes for internal use
+static void checkAdjacentTiles(Board *b, int x, int y);
 static void fillBoard(Board *b, int mines);
 static void fillValues(Board *b);
 static void focusTile(Board *b, int x, int y);
@@ -84,15 +85,25 @@ void flag_tile(Board *b) {
     }
 }
 
-void reveal_tile(Board *b) {
-    if (!b) return;
+int reveal_tile(Board *b) {
+    if (!b) {
+        return -1;
+    }
+    
     int x = b->cursor.positionX;
     int y = b->cursor.positionY;
     Entity *e = &b->tiles[y][x];
 
     if (!e->revealed && !e->flagged) {
         e->revealed = 1; // Reveal the tile
+        if (e->type == ENTITY_BOMB) {
+            return 0; // Hit a bomb
+        }
     }
+
+    checkAdjacentTiles(b, x, y);
+
+    return 1; // Safe
 }
 
 // Frees the memory allocated for the board
@@ -104,6 +115,86 @@ void free_board(Board *b) {
     free(b->tiles);
     free(b);
 }
+
+static void checkAdjacentTiles(Board *b, int x, int y) {
+    if (!b) return;
+
+    Entity *e = &b->tiles[y][x];
+    int dx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    int dy[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+
+    // --- CASE 0 ---
+    if (e->adjacentBombs == 0) {
+        // first reveal all adjacent non-revealed, non-bomb tiles
+        for (int i = 0; i < 8; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if (nx < 0 || ny < 0 || nx >= b->xSize || ny >= b->ySize)
+                continue;
+
+            Entity *adj = &b->tiles[ny][nx];
+
+            if (!adj->revealed && adj->type != ENTITY_BOMB) {
+                adj->revealed = 1;
+            }
+        }
+
+        // Now recurse on neighbors that are 0
+        for (int i = 0; i < 8; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if (nx < 0 || ny < 0 || nx >= b->xSize || ny >= b->ySize)
+                continue;
+
+            Entity *adj = &b->tiles[ny][nx];
+
+            if (adj->adjacentBombs == 0 && !adj->revealed) {
+                checkAdjacentTiles(b, nx, ny);
+            }
+        }
+    } 
+    // --- CASE != 0 ---
+    else {
+        // if revealed, check "chording"
+        if (e->revealed) {
+            int flagCount = 0;
+            for (int i = 0; i < 8; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+
+                if (nx < 0 || ny < 0 || nx >= b->xSize || ny >= b->ySize)
+                    continue;
+
+                Entity *adj = &b->tiles[ny][nx];
+                if (adj->flagged) flagCount++;
+            }
+
+            // if flags >= adjacentBombs, reveal all non-flagged neighbors
+            if (flagCount >= e->adjacentBombs) {
+                for (int i = 0; i < 8; i++) {
+                    int nx = x + dx[i];
+                    int ny = y + dy[i];
+
+                    if (nx < 0 || ny < 0 || nx >= b->xSize || ny >= b->ySize)
+                        continue;
+
+                    Entity *adj = &b->tiles[ny][nx];
+                    if (!adj->revealed && !adj->flagged && adj->type != ENTITY_BOMB) {
+                        adj->revealed = 1;
+
+                        // if a revealed neighbor is 0, recurse
+                        if (adj->adjacentBombs == 0) {
+                            checkAdjacentTiles(b, nx, ny);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 static void removeFocus(Board *b, int x, int y) {
     if (!b) return;
